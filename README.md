@@ -5,9 +5,9 @@ Swaps major/minor tonality of a MIDI file given the original key.
 
 Runs from the terminal using the format: 
 
-<application-name> <input-midi-file-path> <original-song-key>
+[application-name] [input-midi-file-path] [original-song-key]
 
-where <original-song-key> is any valid key signature of the form <tonic><tonality>, or: (C|D|E|F|G|A|B)(b|#)?m?
+where [original-song-key] is any valid key signature of the form <tonic><tonality>, or: (C|D|E|F|G|A|B)(b|#)?m?
 
 Example: MidiKeyChange.exe midis/losing-my-religion.mid Am
 
