@@ -1,7 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
-#include <string.h>
+#include <string>
+#include <sstream>
+#include <vector>
+#include <iostream>
 #include "MIDIKeyChange.h"
 	
 FILE *in, *out;
@@ -10,20 +13,24 @@ int shift[128];
 const int MAJOR = 0;
 const int MINOR = 1;
 
-void      compute_key_change(char* key);
-void      parse_key(char* key, int* tonic, int* tonality);
-void      handle_status(char status);
-void      copy_string(char expected[]);
-void      copy_int(int expected);
-int       copy_next_byte();
-int       copy_next_short_int();
-int       copy_next_int();
-int       next_int();
-short int next_short_int();
-char      next_byte();
-int       copy_next_var_len_int();
-int       is_note_status(unsigned char status);
-void      write_int(int x);
+using namespace std;
+
+void           compute_key_change(char* key);
+void           parse_key(char* key, int* tonic, int* tonality);
+void           handle_status(char status);
+vector<string> &split(const string &s, char delim, vector<string> &elems);
+vector<string> split(const string &s, char delim);
+void           copy_string(char expected[]);
+void           copy_int(int expected);
+int            copy_next_byte();
+int            copy_next_short_int();
+int            copy_next_int();
+int            next_int();
+short int      next_short_int();
+char           next_byte();
+int            copy_next_var_len_int();
+int            is_note_status(unsigned char status);
+void           write_int(int x);
 
 int main(int argc, char** args)
 {
@@ -31,23 +38,27 @@ int main(int argc, char** args)
 	int         status;
 
 	compute_key_change(args[2]);
-
+	
+	string file_path = args[1];
 	status = stat(args[1], &buffer);	
 	in = fopen(args[1], "rb"); 
-	out = fopen("C:\\Users\\Martanicus\\Desktop\\Transposed.mid", "wb");
+	int ext_index = (file_path).find_last_of("."); 
+	string output_file_path = (file_path).substr(0, ext_index); 
+	output_file_path += ".transposed.mid";
+	out = fopen(output_file_path.c_str(), "wb");
 	copy_string("MThd");
 	copy_int(6);
 
-	int format      = copy_next_short_int(NULL);
-	int n_tracks    = copy_next_short_int(NULL);
-	int division    = copy_next_short_int(NULL);
+	int format      = copy_next_short_int();
+	int n_tracks    = copy_next_short_int();
+	int division    = copy_next_short_int();
 
 	int track, MTrk_length;
 
 	for (track = 0; track < n_tracks; track++)
 	{
 		copy_string("MTrk");
-		MTrk_length = copy_next_int(NULL);
+		MTrk_length = copy_next_int();
 		int time;
 		unsigned char status;
 		fpos_t p, start;
@@ -60,6 +71,9 @@ int main(int argc, char** args)
 			handle_status(status);
 		}
 	}
+	
+	cout << "Transposed file output to " << output_file_path;
+	
 	fclose(in);
 	fclose(out);
 }
@@ -179,6 +193,22 @@ void handle_status(char status)
 	}
 }
 
+// from http://stackoverflow.com/questions/236129/how-to-split-a-string-in-c
+vector<string> &split(const string &s, char delim, vector<string> &elems) {
+    stringstream ss(s);
+    string item;
+    while (getline(ss, item, delim)) {
+        elems.push_back(item);
+    }
+    return elems;
+} 
+
+// from http://stackoverflow.com/questions/236129/how-to-split-a-string-in-c
+vector<string> split(const string &s, char delim) {
+    vector<string> elems;
+    split(s, delim, elems);
+    return elems;
+}
 void copy_string(char* expected)
 {
 	int i;
@@ -189,9 +219,7 @@ void copy_string(char* expected)
 		next = fgetc(in);
 		if (next != expected[i])
 		{
-			fpos_t start;
-			fgetpos(in, &start);
-			printf("Error: Improperly formatted .mid file. %s %X %d\n", expected, next, start);
+			printf("Error: Improperly formatted .mid file");
 			fputc('x', out);
 			exit(EXIT_FAILURE);
 		}
@@ -202,7 +230,7 @@ void copy_string(char* expected)
 
 void copy_int(int expected)
 {
-	int next = next_int(NULL);
+	int next = next_int();
 	if (next != expected)
 	{
 		printf("Error: Improperly formatted .mid file.\n");
