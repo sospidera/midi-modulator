@@ -1,7 +1,7 @@
 midi-modulator
 ==============
 
-Swaps major/minor tonality of a MIDI file given the original key.
+Fun little tool to swap major/minor tonality of a MIDI file given the original key.
 
 Runs from the terminal using the format: 
 
@@ -14,5 +14,6 @@ Example: MidiKeyChange.exe midis/losing-my-religion.mid Am
 Currently works on most MIDI files, but throws an error on certain files, potentially because of atypical formatting.
 
 Ideas for future functionality:
+- Improve error handling/reporting (command-line argument parsing, file parsing)
 - Generalize to modes: Dorian, Lydian, etc.
 - Adress pitch bending: currently retains bend-size regardless of new transposed key
