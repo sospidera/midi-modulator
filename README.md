@@ -13,7 +13,7 @@ Example: MidiKeyChange.exe midis/losing-my-religion.mid Am
 
 Currently works on most MIDI files, but throws an error on certain files, potentially because of atypical formatting.
 
-Ideas for future functionality:
+Future work:
 - Improve error handling/reporting (command-line argument parsing, file parsing)
 - Generalize to modes: Dorian, Lydian, etc.
 - Adress pitch bending: currently retains bend-size regardless of new transposed key
